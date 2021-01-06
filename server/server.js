@@ -41,8 +41,7 @@ router.get('/get/unit_data/list', async (ctx, next) => {
 });
 
 router.get('/get/unit_data/base/:unit_id', async (ctx, next) => {
-  let data = {};
-
+  
   const charaBase = await db.queryData(DBHelper.getCharaBaseById, {
     $unit_id: ctx.params.unit_id,
   });
@@ -63,8 +62,26 @@ router.get('/get/unit_data/base/:unit_id', async (ctx, next) => {
       }
     }
   }
-
+  const charaPromotionStatus = await db.queryData(DBHelper.getCharaPromotionStatus, {
+    $unit_id: ctx.params.unit_id,
+  });
+  
   const equipments = await db.queryData(
+    `${DBHelper.getEquipments} ( ${slots.map(() => '?').join(',')} )`,
+    slots
+  );
+  
+  slots.splice(0,slots.length);
+  for (const item of charaPromotion) {
+    for (const key in item) {
+      if (item.hasOwnProperty(key)) {
+        if (/equip_slot_/.test(key) && item[key] !== 999999) {
+          slots.push(item[key]);
+        }
+      }
+    }
+  }
+  const equipmentsPromotion = await db.queryData(
     `${DBHelper.getEquipments} ( ${slots.map(() => '?').join(',')} )`,
     slots
   );
@@ -118,11 +135,18 @@ router.get('/get/unit_data/base/:unit_id', async (ctx, next) => {
     $unit_id: ctx.params.unit_id,
   });
 
+  const charaStoryStatus = await db.queryData(DBHelper.getCharaStoryStatus, {
+    $charaId: ctx.params.unit_id.slice(0,-2),
+  });
+
   ctx.body = {
     charaBase,
+    charaStoryStatus,
     unitRarity,
     charaPromotion,
+    charaPromotionStatus,
     equipments,
+    equipmentsPromotion,
     uniqueEquipment,
     uniqueEquipmentEnhance,
     unitSkillData,
@@ -188,7 +212,8 @@ app.use(
       // if (ctx.url === '/test') {
       // return '*'; // 允许来自所有域名请求
       // }
-      return 'http://localhost:8080'; //只允许http://localhost:8080这个域名的请求
+      return '*';
+      // return 'http://localhost:8080'; //只允许http://localhost:8080这个域名的请求
     },
     maxAge: 5, //指定本次预检请求的有效期，单位为秒。
     credentials: true, //是否允许发送Cookie

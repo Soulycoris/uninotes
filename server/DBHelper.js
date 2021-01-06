@@ -115,6 +115,7 @@ const DBHelper = {
   OR a.chara_id_10 = $charaId`,
   /**
    * 获取角色剧情数据
+   * @param $charaId 
    */
   getCharaStoryStatus: ` SELECT * 
   FROM chara_story_status 
@@ -131,13 +132,11 @@ const DBHelper = {
   /**
    * 获取角色Rank汇总数据
    * @param unit_id unit_id
-   * @param limit 行数
    */
   getCharaPromotionStatus: `SELECT * 
   FROM unit_promotion_status 
   WHERE unit_id=$unit_id 
-  ORDER BY promotion_level DESC 
-  LIMIT $limit`,
+  ORDER BY promotion_level DESC`,
   /**
    * 获取角色装备数据
    * @param unit_id unit_id

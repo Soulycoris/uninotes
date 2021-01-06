@@ -1,27 +1,9 @@
 <template>
   <view>
-    <view
-      class="char-list-item"
-      v-for="item in charaList"
-      :key="item.unit_id"
-      :data-unitId="item.unit_id"
-      @click="charaBaseTo(item.unit_id)"
-    >
-      <view
-        class="item-icon"
-        :class="computedClassPositioning(item.search_area_width)"
-      >
-      </view>
+    <view class="char-list-item" v-for="item in charaList" :key="item.unit_id" :data-unitId="item.unit_id" @click="charaBaseTo(item.unit_id)">
+      <view class="item-icon" :class="computedClassPositioning(item.search_area_width)"> </view>
       <view class="item-head-img">
-        <img
-          :src="
-            `http://localhost:3000/redive/estertion/icon/unit/${
-              item.rarity === 6 ? item.prefab_id + 60 : item.prefab_id + 30
-            }`
-          "
-          alt=""
-          srcset=""
-        />
+        <img :src="`http://localhost:3000/redive/estertion/icon/unit/${item.rarity === 6 ? item.prefab_id + 60 : item.prefab_id + 30}`" alt="" srcset="" />
       </view>
       <view class="item-name">
         <view class="item-jpn">{{ item.unit_name }}</view>
@@ -30,7 +12,7 @@
         </view>
       </view>
       <view class="item-other">
-        <text v-if="sort">{{ item[sort] || '' }}</text>
+        <text v-if="sort">{{ item[sort] || "" }}</text>
         <view slot v-else></view>
       </view>
     </view>
@@ -48,26 +30,26 @@ export default {
     sort: {
       type: String,
       default() {
-        return '';
+        return "";
       },
     },
   },
   data() {
     return {
-      title: 'Hello',
+      title: "Hello",
     };
   },
   methods: {
     charaBaseTo(unitid) {
-      this.$emit('on-click', unitid);
+      this.$emit("on-click", unitid);
     },
     computedClassPositioning(width) {
       if (width <= 300) {
-        return 'type1';
+        return "type1";
       } else if (width <= 600) {
-        return 'type2';
+        return "type2";
       } else {
-        return 'type3';
+        return "type3";
       }
     },
   },
@@ -85,7 +67,7 @@ export default {
   .item-icon {
     width: 40rpx;
     height: 40rpx;
-    background: url('/static/img/AtlasCommon.png') no-repeat;
+    background: url("/static/img/AtlasCommon.png") no-repeat;
     background-size: cover;
     margin-right: 20rpx;
     &.type1 {

@@ -1,34 +1,44 @@
-2978
-hp:
-星级 hp + ( hp_growth * level + 1 ) + hp + rank_hp
-50级 1星
+公式：
 
-3029
+角色剧情属性        + 四舍五入(2 * 所有装备属性     + 角色Rank汇总数据       + 角色星级数据 + 角色星级成长数据 * 等级)          + 向上取整(专武数据                + 专武升级数据 * 专武等级)
+chara_story_status + Math.round(2 * equipment_data  + unit_promotion_status + unitRarity  + unitRarity.*_growth * level) + Math.ceil(unique_equipment_data + unique_equipment_enhance_rate * level)
 
-r4 3670 
-r5 4416 746  202
-r6 5086 670  252
-r7 6112 1026 303
-r8 7149 1037 455
-
-
-r8 3665 885
-r7 2780 975
-r6 1805 620
-r5 1185
-r4 490
-
-380 325 270   975
-450 270 165   885
-
-70级 1星
-
-4038
-
-r8 8057     354
-r9 9357     403
-r10 10468   454
-
-r8 3665
-r9 4916
-r10 5976
+switch(status_type_)
+case "1":
+  C.hp += Number(I["status_rate_" + i]);
+  break;
+case "2":
+  C.atk += Number(I["status_rate_" + i]);
+  break;
+case "3":
+  C.def += Number(I["status_rate_" + i]);
+  break;
+case "4":
+  C.magic_str += Number(I["status_rate_" + i]);
+  break;
+case "5":
+  C.magic_def += Number(I["status_rate_" + i]);
+  break;
+case "6":
+  C.physical_critical += Number(I["status_rate_" + i]);
+  break;
+case "7":
+  C.magic_critical += Number(I["status_rate_" + i]);
+  break;
+case "8":
+  C.dodge += Number(I["status_rate_" + i]);
+  break;
+case "9":
+  C.life_steal += Number(I["status_rate_" + i]);
+  break;
+case "10":
+  C.wave_hp_recovery += Number(I["status_rate_" + i]);
+  break;
+case "11":
+  C.wave_energy_recovery += Number(I["status_rate_" + i]);
+  break;
+case "15":
+  C.hp_recovery_rate += Number(I["status_rate_" + i]);
+  break;
+case "17":
+  C.accuracy += Number(I["status_rate_" + i]);

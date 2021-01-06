@@ -1,32 +1,16 @@
 <template>
   <view class="chara-base" v-if="charaBase.unitRarity">
     <view class="chara-img">
-      <img
-        :src="
-          `http://localhost:3000/redive/estertion/card/full/${
-            charaBase.unitRarity.length === 6
-              ? charaBase.charaBase[0].prefab_id + 60
-              : charaBase.charaBase[0].prefab_id + 30
-          }`
-        "
-        alt=""
-        srcset=""
-      />
+      <img :src="`http://localhost:3000/redive/estertion/card/full/${charaBase.unitRarity.length === 6 ? charaBase.charaBase[0].prefab_id + 60 : charaBase.charaBase[0].prefab_id + 30}`" alt="" srcset="" />
     </view>
-    <chara-list-item
-      :charaList="charaBase.charaBase || []"
-      @on-click="charaBaseTo"
-    >
-    </chara-list-item>
+    <chara-list-item :charaList="charaBase.charaBase || []" @on-click="charaBaseTo"> </chara-list-item>
     <view class="chara-state">
       <view class="chara-state-box chara-state-level">
         <view class="chara-tag">状态参数</view>
         <view class="chara-level">Lv178&nbsp;&nbsp;&nbsp;&nbsp;Rank18</view>
       </view>
       <view class="chara-state-box">
-        <view>
-          通常攻击待机时间：{{ charaBase.charaBase[0].normal_atk_cast_time }}s
-        </view>
+        <view> 通常攻击待机时间：{{ charaBase.charaBase[0].normal_atk_cast_time }}s </view>
       </view>
       <view class="chara-state-box">
         <view class="chara-state-item">
@@ -47,31 +31,16 @@
         <view class="chara-state-box" :key="pattern.pattern_id + index">
           <view class="chara-tag">
             技能循环
-            {{ charaBase.unitAttackPattern.length > 1 ? index + 1 : '' }}
+            {{ charaBase.unitAttackPattern.length > 1 ? index + 1 : "" }}
           </view>
         </view>
-        <view
-          class="chara-state-box"
-          :key="pattern.pattern_id + index + 'loop'"
-        >
+        <view class="chara-state-box" :key="pattern.pattern_id + index + 'loop'">
           <view class="chara-state-skill-loop">
-            <view
-              class="chara-state-skill-loop-item"
-              v-for="item in pattern.loop_end"
-              :key="'pattern' + item"
-            >
+            <view class="chara-state-skill-loop-item" v-for="item in pattern.loop_end" :key="'pattern' + item">
               <view>
                 {{ item | filterLoopTopText(pattern) }}
               </view>
-              <img
-                :src="
-                  `http://localhost:3000/redive/estertion/icon/skill/${skillType(
-                    item,
-                    pattern
-                  )}`
-                "
-                alt=""
-              />
+              <img :src="`http://localhost:3000/redive/estertion/icon/skill/${skillType(item, pattern)}`" alt="" />
               <view>
                 {{ item | filterLoopBottomText(pattern) }}
               </view>
@@ -79,19 +48,13 @@
           </view>
         </view>
       </template>
-
       <template v-for="skill in charaBase.skillData">
         <view class="chara-state-box" :key="skill.skill_id + 'tag'">
           <view class="chara-tag">{{ filterSkill(skill.skill_id) }}</view>
         </view>
         <view class="chara-state-box" :key="skill.skill_id">
           <view class="chara-state-skill">
-            <img
-              :src="
-                `http://localhost:3000/redive/estertion/icon/skill/${skill.icon_type}`
-              "
-              alt=""
-            />
+            <img :src="`http://localhost:3000/redive/estertion/icon/skill/${skill.icon_type}`" alt="" />
           </view>
           <view class="chara-state-skill-name">
             <view class="chara-state-skill-name-text">
@@ -109,61 +72,56 @@
           <view>
             技能动作
           </view>
-          <view
-            v-for="(item, index) in skill.actionDataArr || []"
-            :key="item.action_id"
-          >
-            {{ index + 1 }}. {{ item.description }}
-          </view>
+          <view v-for="(item, index) in skill.actionDataArr || []" :key="item.action_id"> {{ index + 1 }}. {{ item.description }} </view>
         </view>
       </template>
     </view>
   </view>
 </template>
 <script>
-import charaListItem from '../components/chara-list-item.vue';
+import charaListItem from "../components/chara-list-item.vue";
 export default {
-  name: 'chara-base',
+  name: "chara-base",
   data() {
     return {
-      title: 'Hello',
-      unit_id: '',
+      title: "Hello",
+      unit_id: "",
       charaBase: {},
     };
   },
   filters: {
     filterLoopTopText(value, pattern) {
       if (value == pattern.loop_start) {
-        return '循环开始';
+        return "循环开始";
       } else if (value == pattern.loop_end) {
-        return '循环结束';
+        return "循环结束";
       }
-      return '\u00a0';
+      return "\u00a0";
     },
     filterLoopBottomText(index, pattern) {
       let atk_type = pattern[`atk_pattern_${index}`];
-      let text = '';
+      let text = "";
       switch (atk_type) {
         case 1:
-          text = '普通攻击';
+          text = "普通攻击";
           break;
         case 1001:
-          text = 'Main 1';
+          text = "Main 1";
           break;
         case 1002:
-          text = 'Main 2';
+          text = "Main 2";
           break;
         case 2001:
-          text = 'SP 1';
+          text = "SP 1";
           break;
         case 2002:
-          text = 'SP 2';
+          text = "SP 2";
           break;
         case 2003:
-          text = 'SP 3';
+          text = "SP 3";
           break;
         default:
-          text = '\u00a0';
+          text = "\u00a0";
           break;
       }
       return text;
@@ -188,7 +146,7 @@ export default {
   methods: {
     getCharaBase(unitId) {
       uni.request({
-        url: 'http://localhost:3000/get/unit_data/base/' + unitId,
+        url: "http://localhost:3000/get/unit_data/base/" + unitId,
         success: (res) => {
           this.charaBase = res.data;
           this.skillActionInit();
@@ -205,11 +163,7 @@ export default {
           }
         }
         actionArr.forEach((element) => {
-          for (
-            let index = 0;
-            index < this.charaBase.skillAction.length;
-            index++
-          ) {
+          for (let index = 0; index < this.charaBase.skillAction.length; index++) {
             const ele = this.charaBase.skillAction[index];
             if (ele.action_id === element) {
               actionDataArr.push(ele);
@@ -241,8 +195,7 @@ export default {
           skill_id = this.charaBase.unitSkillData[0].sp_skill_3;
           break;
         case 1:
-          icon_type =
-            this.charaBase.charaBase[0].atk_type === 1 ? 101011 : 101251;
+          icon_type = this.charaBase.charaBase[0].atk_type === 1 ? 101011 : 101251;
           break;
 
         default:
@@ -259,8 +212,8 @@ export default {
       return icon_type;
     },
     filterSkill(skill_id) {
-      let skillKey = '',
-        text = '';
+      let skillKey = "",
+        text = "";
       for (const key in this.charaBase.unitSkillData[0]) {
         if (skill_id === this.charaBase.unitSkillData[0][key]) {
           skillKey = key;
@@ -268,38 +221,38 @@ export default {
       }
       // console.log(skillKey);
       switch (skillKey) {
-        case 'union_burst':
-          text = 'UB';
+        case "union_burst":
+          text = "UB";
           break;
-        case 'union_burst_evolution':
-          text = 'UB+';
+        case "union_burst_evolution":
+          text = "UB+";
           break;
-        case 'main_skill_1':
-          text = 'Main 1';
+        case "main_skill_1":
+          text = "Main 1";
           break;
-        case 'main_skill_evolution_1':
-          text = 'Main 1+';
+        case "main_skill_evolution_1":
+          text = "Main 1+";
           break;
-        case 'main_skill_2':
-          text = 'Main 2';
+        case "main_skill_2":
+          text = "Main 2";
           break;
-        case 'sp_skill_1':
-          text = 'SP 1';
+        case "sp_skill_1":
+          text = "SP 1";
           break;
-        case 'sp_skill_2':
-          text = 'SP 2';
+        case "sp_skill_2":
+          text = "SP 2";
           break;
-        case 'sp_skill_3':
-          text = 'SP 3';
+        case "sp_skill_3":
+          text = "SP 3";
           break;
-        case 'ex_skill_1':
-          text = 'EX';
+        case "ex_skill_1":
+          text = "EX";
           break;
-        case 'ex_skill_evolution_1':
-          text = 'EX+';
+        case "ex_skill_evolution_1":
+          text = "EX+";
           break;
         default:
-          text = 'EX';
+          text = "EX";
           break;
       }
       return text;

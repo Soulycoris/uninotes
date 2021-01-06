@@ -49,7 +49,7 @@ class SqliteDB {
       this.db.all(sql, params, (err, rows) => {
         if (null != err) {
           this.printErrorInfo(err);
-          reject(err);
+          reject(null);
         }
         resolve(rows);
       });
@@ -61,7 +61,7 @@ class SqliteDB {
       this.db.run(sql, (err) => {
         if (null != err) {
           this.printErrorInfo(err);
-          reject(err);
+          reject(null);
         }
         resolve();
       });
