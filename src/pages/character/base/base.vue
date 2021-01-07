@@ -86,7 +86,28 @@ export default {
     return {
       title: "Hello",
       unit_id: "",
+      level: 184,
+      rank: 19,
       charaBase: {},
+      unitStatus: {
+        accuracy: 0,
+        atk: 0,
+        def: 0,
+        dodge: 0,
+        energy_recovery_rate: 0,
+        energy_reduce_rate: 0,
+        hp: 0,
+        hp_recovery_rate: 0,
+        life_steal: 0,
+        magic_critical: 0,
+        magic_def: 0,
+        magic_penetrate: 0,
+        magic_str: 0,
+        physical_critical: 0,
+        physical_penetrate: 0,
+        wave_energy_recovery: 0,
+        wave_hp_recovery: 0,
+      },
     };
   },
   filters: {
@@ -149,7 +170,10 @@ export default {
         url: "http://localhost:3000/get/unit_data/base/" + unitId,
         success: (res) => {
           this.charaBase = res.data;
+          this.level = this.charaBase.charaPromotionStatus[0].promotion_level;
+          this.rank = this.charaBase.charaPromotionStatus[0].promotion_level;
           this.skillActionInit();
+          this.stateInit();
         },
       });
     },
@@ -174,35 +198,97 @@ export default {
         // console.log(actionDataArr);
       });
     },
+    stateInit() {
+      this.charaBase.charaStoryStatus.forEach((element) => {
+        for (let i = 1; i <= 5; i++) {
+          const key = element["status_type_" + i];
+          const value = +element["status_rate_" + i];
+          switch (key) {
+            case 1:
+              this.unitStatus.hp += value;
+              break;
+            case 2:
+              this.unitStatus.atk += value;
+              break;
+            case 3:
+              this.unitStatus.def += value;
+              break;
+            case 4:
+              this.unitStatus.magic_str += value;
+              break;
+            case 5:
+              this.unitStatus.magic_def += value;
+              break;
+            case 6:
+              this.unitStatus.physical_critical += value;
+              break;
+            case 7:
+              this.unitStatus.magic_critical += value;
+              break;
+            case 8:
+              this.unitStatus.dodge += value;
+              break;
+            case 9:
+              this.unitStatus.life_steal += value;
+              break;
+            case 10:
+              this.unitStatus.wave_hp_recovery += value;
+              break;
+            case 11:
+              this.unitStatus.wave_energy_recovery += value;
+              break;
+            case 15:
+              this.unitStatus.hp_recovery_rate += value;
+              break;
+            case 17:
+              this.unitStatus.accuracy += value;
+              break;
+            default:
+              break;
+          }
+        }
+      });
+      this.charaBase.equipments.forEach((e) => {
+        for (const key in this.unitStatus) {
+          this.unitStatus[key] += 2 * e[key];
+        }
+      });
+      let charaPromotionStatus = this.charaBase.charaPromotionStatus[0];
+      let unitRarity = this.charaBase.unitRarity[0];
+      for (const key in this.unitStatus) {
+        this.unitStatus[key] = Math.round(this.unitStatus[key] + charaPromotionStatus[key] + unitRarity[key] + unitRarity[`${key}_growth`] * (this.level + this.rank));
+      }
+    },
+
     charaBaseTo() {},
     skillType(index, pattern) {
       let skill_id = 0;
       let icon_type = 1003;
+      let unitSkillData = this.charaBase.unitSkillData[0]
       switch (pattern[`atk_pattern_${index}`]) {
         case 1001:
-          skill_id = this.charaBase.unitSkillData[0].main_skill_1;
+          skill_id = unitSkillData.main_skill_1;
           break;
         case 1002:
-          skill_id = this.charaBase.unitSkillData[0].main_skill_2;
+          skill_id = unitSkillData.main_skill_2;
           break;
         case 2001:
-          skill_id = this.charaBase.unitSkillData[0].sp_skill_1;
+          skill_id = unitSkillData.sp_skill_1;
           break;
         case 2002:
-          skill_id = this.charaBase.unitSkillData[0].sp_skill_2;
+          skill_id = unitSkillData.sp_skill_2;
           break;
         case 2003:
-          skill_id = this.charaBase.unitSkillData[0].sp_skill_3;
+          skill_id = unitSkillData.sp_skill_3;
           break;
         case 1:
           icon_type = this.charaBase.charaBase[0].atk_type === 1 ? 101011 : 101251;
           break;
-
         default:
           break;
       }
 
-      for (let index = 0; index < this.charaBase.skillData.length; index++) {
+      for (let index = 0, length = this.charaBase.skillData.length; index < length; index++) {
         const element = this.charaBase.skillData[index];
         if (element.skill_id == skill_id && skill_id) {
           icon_type = element.icon_type;
