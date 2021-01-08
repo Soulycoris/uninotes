@@ -7,19 +7,17 @@
     <view class="chara-state">
       <view class="chara-state-box chara-state-level">
         <view class="chara-tag">状态参数</view>
-        <view class="chara-level">Lv178&nbsp;&nbsp;&nbsp;&nbsp;Rank18</view>
+        <view class="chara-level">Lv {{ level }}&nbsp;&nbsp;&nbsp;&nbsp;Rank {{ rank }}</view>
       </view>
       <view class="chara-state-box">
         <view> 通常攻击待机时间：{{ charaBase.charaBase[0].normal_atk_cast_time }}s </view>
       </view>
       <view class="chara-state-box">
-        <view class="chara-state-item">
-          <view class="chara-state-item-tag">物理攻击力</view>
-          <view class="chara-state-item-text">52</view>
-        </view>
-        <view class="chara-state-item">
-          <view class="chara-state-item-tag">魔法攻击力</view>
-          <view class="chara-state-item-text">52</view>
+        <view class="chara-state-status">
+          <view class="chara-state-item" v-for="(value, name) in unitStatus" :key="name">
+            <view class="chara-state-item-tag">{{name | stateText}}</view>
+            <view class="chara-state-item-text">{{value}}</view>
+          </view>
         </view>
       </view>
       <view class="chara-state-box">
@@ -52,7 +50,7 @@
         <view class="chara-state-box" :key="skill.skill_id + 'tag'">
           <view class="chara-tag">{{ filterSkill(skill.skill_id) }}</view>
         </view>
-        <view class="chara-state-box" :key="skill.skill_id">
+        <view class="chara-state-box" :key="skill.skill_id + 'name'">
           <view class="chara-state-skill">
             <img :src="`http://localhost:3000/redive/estertion/icon/skill/${skill.icon_type}`" alt="" />
           </view>
@@ -72,7 +70,7 @@
           <view>
             技能动作
           </view>
-          <view v-for="(item, index) in skill.actionDataArr || []" :key="item.action_id"> {{ index + 1 }}. {{ item.description }} </view>
+          <view v-for="(item, index) in skill.actionDataArr || []" :key="index+'des'"> {{ index + 1 }}. {{ item.description }} </view>
         </view>
       </template>
     </view>
@@ -88,25 +86,26 @@ export default {
       unit_id: "",
       level: 184,
       rank: 19,
+      uniqueEquipmentLevel: 189,
       charaBase: {},
       unitStatus: {
-        accuracy: 0,
         atk: 0,
         def: 0,
-        dodge: 0,
+        magic_str: 0,
+        magic_def: 0,
+        physical_critical: 0,
+        magic_critical: 0,
+        hp: 0,
+        life_steal: 0,
         energy_recovery_rate: 0,
         energy_reduce_rate: 0,
-        hp: 0,
-        hp_recovery_rate: 0,
-        life_steal: 0,
-        magic_critical: 0,
-        magic_def: 0,
-        magic_penetrate: 0,
-        magic_str: 0,
-        physical_critical: 0,
-        physical_penetrate: 0,
-        wave_energy_recovery: 0,
+        accuracy: 0,
+        dodge: 0,
         wave_hp_recovery: 0,
+        wave_energy_recovery: 0,
+        magic_penetrate: 0,
+        physical_penetrate: 0,
+        hp_recovery_rate: 0,
       },
     };
   },
@@ -147,33 +146,78 @@ export default {
       }
       return text;
     },
+    stateText(key){
+      const stateText = {
+        hp: 'HP',
+        atk: '物理攻击',
+        def: '物理防御',
+        magic_str: '魔法攻击',
+        magic_def: '魔法防御',
+        physical_critical: '物理暴击',
+        magic_critical: '魔法暴击',
+        accuracy: '命中',
+        dodge: '闪避',
+        life_steal: '生命吸收',
+        wave_hp_recovery: 'HP自动回复',
+        wave_energy_recovery: 'TP自动回复',
+        hp_recovery_rate: '回复量上升',
+        energy_recovery_rate: 'TP上升',
+        energy_reduce_rate: 'TP消耗减轻',
+        magic_penetrate: '魔法穿透',
+        physical_penetrate: '物理穿透',
+      }
+      return stateText[key] || ''
+    }
   },
   computed: {
-    computedLoop() {
-      if (!this.charaBase.charaBase) {
-        return 0;
-      }
-      return this.charaBase.unitAttackPattern.loop_end;
-    },
+    // computedLoop() {
+    //   if (!this.charaBase.charaBase) {
+    //     return 0;
+    //   }
+    //   return this.charaBase.unitAttackPattern.loop_end;
+    // },
   },
   onLoad(option) {
-    // this.unit_id = option.unit_id;
+    this.unit_id = option.unit_id;
     this.getCharaBase(option.unit_id);
+    this.getMaxLevel()
+    this.getMaxUniqueEquipmentLevel()
   },
   // onReady() {
   //   this.getCharaBase(this.unit_id);
   // },
   components: { charaListItem },
   methods: {
+    getMaxLevel() {
+      uni.request({
+        url: "http://localhost:3000/get/unit_data/maxLevel",
+        success: (res) => {
+          if (res.data) {
+            this.level = --res.data;
+          }
+        },
+      });
+    },
+    getMaxUniqueEquipmentLevel() {
+      uni.request({
+        url: "http://localhost:3000/get/unit_data/maxUniqueEquipmentLevel",
+        success: (res) => {
+          if (res.data) {
+            this.uniqueEquipmentLevel = --res.data;
+          }
+        },
+      });
+    },
     getCharaBase(unitId) {
       uni.request({
         url: "http://localhost:3000/get/unit_data/base/" + unitId,
         success: (res) => {
-          this.charaBase = res.data;
-          this.level = this.charaBase.charaPromotionStatus[0].promotion_level;
-          this.rank = this.charaBase.charaPromotionStatus[0].promotion_level;
-          this.skillActionInit();
-          this.stateInit();
+          if (res.data) {
+            this.charaBase = res.data;
+            this.rank = this.charaBase.charaPromotionStatus[0].promotion_level;
+            this.skillActionInit();
+            this.stateInit();
+          }
         },
       });
     },
@@ -253,18 +297,25 @@ export default {
           this.unitStatus[key] += 2 * e[key];
         }
       });
-      let charaPromotionStatus = this.charaBase.charaPromotionStatus[0];
-      let unitRarity = this.charaBase.unitRarity[0];
+      const unitRarity = this.charaBase.unitRarity[0];
+      const charaPromotionStatus = this.charaBase.charaPromotionStatus[0];
+      const uniqueEquipment = this.charaBase.uniqueEquipment[0]
+      const uniqueEquipmentEnhance = this.charaBase.uniqueEquipmentEnhance[0]
       for (const key in this.unitStatus) {
         this.unitStatus[key] = Math.round(this.unitStatus[key] + charaPromotionStatus[key] + unitRarity[key] + unitRarity[`${key}_growth`] * (this.level + this.rank));
+        if (uniqueEquipment) {
+          this.unitStatus[key] += Math.ceil(uniqueEquipment[key] + uniqueEquipmentEnhance[key] * this.uniqueEquipmentLevel);
+        }
       }
+
+
     },
 
     charaBaseTo() {},
     skillType(index, pattern) {
       let skill_id = 0;
       let icon_type = 1003;
-      let unitSkillData = this.charaBase.unitSkillData[0]
+      let unitSkillData = this.charaBase.unitSkillData[0];
       switch (pattern[`atk_pattern_${index}`]) {
         case 1001:
           skill_id = unitSkillData.main_skill_1;
@@ -331,6 +382,9 @@ export default {
         case "sp_skill_3":
           text = "SP 3";
           break;
+        case "sp_skill_evolution_1":
+          text = "SP +";
+          break;
         case "ex_skill_1":
           text = "EX";
           break;
@@ -360,7 +414,7 @@ export default {
     .chara-tag {
       display: inline;
       border-radius: 4px;
-      padding: 0 9rpx 6rpx 9rpx;
+      padding: 1rpx 9rpx 6rpx 9rpx;
       color: #fff;
       background-color: #773f99;
     }
@@ -376,20 +430,21 @@ export default {
     align-items: center;
     // justify-content: space-between;
     margin-bottom: 20rpx;
+    .chara-state-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
     .chara-state-item {
       display: flex;
       justify-content: space-between;
-      flex: 1;
+      width: 48%;
+      margin-top: 16rpx;
       border-bottom: 1px solid #525252;
-      &:first-child {
-        margin-right: 8rpx;
-      }
-      &:last-child {
-        margin-left: 8rpx;
-      }
       .chara-state-item-tag {
         background-color: #525252;
-        padding: 0 4rpx;
+        padding: 1rpx 6rpx 1rpx 6rpx;
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
       }

@@ -133,7 +133,7 @@ router.get("/get/unit_data/base/:unit_id", async (ctx, next) => {
     charaPromotion,
     charaPromotionStatus,
     equipments,
-    equipmentsPromotion,
+    // equipmentsPromotion,
     uniqueEquipment,
     uniqueEquipmentEnhance,
     unitSkillData,
@@ -145,7 +145,19 @@ router.get("/get/unit_data/base/:unit_id", async (ctx, next) => {
 
 router.get("/get/unit_data/maxLevel", async (ctx, next) => {
   const level = await db.queryData(DBHelper.maxCharaLevel);
-  ctx.body = level
+  if (level.length) {
+    ctx.body = level[0]['max(team_level)']
+  }else{
+    ctx.body = 0
+  }
+});
+router.get("/get/unit_data/maxUniqueEquipmentLevel", async (ctx, next) => {
+  const level = await db.queryData(DBHelper.maxUniqueEquipmentLevel);
+  if (level.length) {
+    ctx.body = level[0]['max(enhance_level)']
+  }else{
+    ctx.body = 0
+  }
 });
 
 router.get("/db/close", async (ctx, next) => {
