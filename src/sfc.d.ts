@@ -18,7 +18,7 @@ interface charaData {
   unitAttackPattern: unitAttackPattern[];
 }
 
-interface unitStatus {
+interface charaStatus {
   atk: number;
   def: number;
   magic_str: number;
@@ -37,7 +37,7 @@ interface unitStatus {
   physical_penetrate: number;
   hp_recovery_rate: number;
 }
-type unitStatusKey = keyof unitStatus;
+type charaStatusKey = keyof charaStatus;
 
 interface charaBase {
   unit_id: number;

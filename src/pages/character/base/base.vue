@@ -1,20 +1,20 @@
 <template>
-  <view class="chara-base" v-if="!!charaData">
+  <view class="chara-base">
     <view class="chara-img">
-      <img :src="`http://localhost:3000/redive/estertion/card/full/${charaData.unitRarity.length === 6 ? charaData.charaBase[0].prefab_id + 60 : charaData.charaBase[0].prefab_id + 30}`" alt="" srcset="" />
+      <img v-if="charaData.charaBase.length" :src="`http://localhost:3000/redive/estertion/card/full/${charaData.unitRarity.length === 6 ? charaData.charaBase[0].prefab_id + 60 : charaData.charaBase[0].prefab_id + 30}`" alt="" srcset="" />
     </view>
-    <chara-list-item :charaList="charaData.charaBase || []" @on-click="charaDataTo"> </chara-list-item>
+    <chara-list-item :charaList="charaData.charaBase" @on-click="toCharaProfile"> </chara-list-item>
     <view class="chara-state">
       <view class="chara-state-box chara-state-level">
         <view class="chara-tag">状态参数</view>
         <view class="chara-level">Lv {{ level }}&nbsp;&nbsp;&nbsp;&nbsp;Rank {{ rank }}</view>
       </view>
       <view class="chara-state-box">
-        <view> 通常攻击待机时间：{{ charaData.charaBase[0].normal_atk_cast_time }}s </view>
+        <view> 通常攻击待机时间：{{ charaData.charaBase.length && charaData.charaBase[0].normal_atk_cast_time }}s </view>
       </view>
       <view class="chara-state-box">
         <view class="chara-state-status">
-          <view class="chara-state-item" v-for="(value, name) in unitStatus" :key="name">
+          <view class="chara-state-item" v-for="(value, name) in charaStatus" :key="name">
             <view class="chara-state-item-tag">{{ name | stateText }}</view>
             <view class="chara-state-item-text">{{ value }}</view>
           </view>
@@ -77,14 +77,9 @@
   </view>
 </template>
 <script lang="ts">
-import charaListItem from "../components/chara-list-item.vue";
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import charaListItem from "@/components/character/chara-list-item.vue";
+import { Component, Vue } from "vue-property-decorator";
 
-// interface pattern {
-//   loop_start: number;
-//   loop_end: number;
-// }
-// type unitAttackPatternKey =
 @Component({
   name: "CharaBase",
   filters: {
@@ -126,7 +121,7 @@ import { Component, Prop, Vue, Watch } from "vue-property-decorator";
       }
       return text;
     },
-    stateText(key: unitStatusKey) {
+    stateText(key: charaStatusKey) {
       const stateText = {
         hp: "HP",
         atk: "物理攻击",
@@ -152,12 +147,25 @@ import { Component, Prop, Vue, Watch } from "vue-property-decorator";
   components: { charaListItem },
 })
 export default class extends Vue {
-  private unit_id: string = "";
+  private unit_id: number = 0;
   private level: number = 184;
   private rank: number = 19;
   private uniqueEquipmentLevel: number = 19;
-  private charaData: charaData | undefined;
-  private unitStatus: unitStatus = {
+  private charaData: charaData = {
+    charaBase: [],
+    charaStoryStatus: [],
+    unitRarity: [],
+    charaPromotion: [],
+    charaPromotionStatus: [],
+    equipments: [],
+    uniqueEquipment: [],
+    uniqueEquipmentEnhance: [],
+    unitSkillData: [],
+    skillData: [],
+    skillAction: [],
+    unitAttackPattern: [],
+  };
+  private charaStatus: charaStatus = {
     atk: 0,
     def: 0,
     magic_str: 0,
@@ -178,21 +186,19 @@ export default class extends Vue {
   };
 
   public onLoad(option: any): void {
-    this.unit_id = option.unit_id;
-    this.getCharaBase(option.unit_id);
+    this.unit_id = +option.unit_id;
+    this.getCharaBase(this.unit_id);
     this.getMaxLevel();
     this.getMaxUniqueEquipmentLevel();
   }
-  // public onReady() : void {
-  // //   this.getCharaBase(this.unit_id);
-  // }
 
   public getMaxLevel() {
     uni.request({
       url: "http://localhost:3000/get/unit_data/maxLevel",
       success: (res) => {
         if (typeof res.data === "number") {
-          this.level = res.data;
+          this.level = --res.data;
+          this.$store.commit("setLevel", this.level);
         }
       },
     });
@@ -204,18 +210,23 @@ export default class extends Vue {
       success: (res) => {
         if (typeof res.data === "number") {
           this.uniqueEquipmentLevel = --res.data;
+          this.$store.commit("setUniqueEquipmentLevel", this.uniqueEquipmentLevel);
         }
       },
     });
   }
 
-  public getCharaBase(unitId: string) {
+  public getCharaBase(unitId: number) {
     uni.request({
       url: "http://localhost:3000/get/unit_data/base/" + unitId,
       success: (res) => {
         if (res.data) {
-          this.charaData = res.data as charaData;
-          this.rank = this.charaData.charaPromotionStatus[0].promotion_level;
+          this.$set(this, "charaData", res.data as charaData);
+          this.$store.commit("setCharaData", res.data);
+          if (this.charaData) {
+            this.rank = this.charaData.charaPromotionStatus[0].promotion_level;
+            this.$store.commit("setRank", this.rank);
+          }
           this.skillActionInit();
           this.stateInit();
         }
@@ -262,43 +273,43 @@ export default class extends Vue {
         const value = +element[`status_rate_${i}` as charaStoryStatusKey];
         switch (key) {
           case 1:
-            this.unitStatus.hp += value;
+            this.charaStatus.hp += value;
             break;
           case 2:
-            this.unitStatus.atk += value;
+            this.charaStatus.atk += value;
             break;
           case 3:
-            this.unitStatus.def += value;
+            this.charaStatus.def += value;
             break;
           case 4:
-            this.unitStatus.magic_str += value;
+            this.charaStatus.magic_str += value;
             break;
           case 5:
-            this.unitStatus.magic_def += value;
+            this.charaStatus.magic_def += value;
             break;
           case 6:
-            this.unitStatus.physical_critical += value;
+            this.charaStatus.physical_critical += value;
             break;
           case 7:
-            this.unitStatus.magic_critical += value;
+            this.charaStatus.magic_critical += value;
             break;
           case 8:
-            this.unitStatus.dodge += value;
+            this.charaStatus.dodge += value;
             break;
           case 9:
-            this.unitStatus.life_steal += value;
+            this.charaStatus.life_steal += value;
             break;
           case 10:
-            this.unitStatus.wave_hp_recovery += value;
+            this.charaStatus.wave_hp_recovery += value;
             break;
           case 11:
-            this.unitStatus.wave_energy_recovery += value;
+            this.charaStatus.wave_energy_recovery += value;
             break;
           case 15:
-            this.unitStatus.hp_recovery_rate += value;
+            this.charaStatus.hp_recovery_rate += value;
             break;
           case 17:
-            this.unitStatus.accuracy += value;
+            this.charaStatus.accuracy += value;
             break;
           default:
             break;
@@ -306,25 +317,30 @@ export default class extends Vue {
       }
     });
     this.charaData.equipments.forEach((e) => {
-      let key: unitStatusKey;
-      for (key in this.unitStatus) {
-        this.unitStatus[key] += 2 * e[key];
+      let key: charaStatusKey;
+      for (key in this.charaStatus) {
+        this.charaStatus[key] += 2 * e[key];
       }
     });
     const unitRarity = this.charaData.unitRarity[0];
     const charaPromotionStatus = this.charaData.charaPromotionStatus[0];
     const uniqueEquipment = this.charaData.uniqueEquipment[0];
     const uniqueEquipmentEnhance = this.charaData.uniqueEquipmentEnhance[0];
-    let key: unitStatusKey;
-    for (key in this.unitStatus) {
-      this.unitStatus[key] = Math.round(this.unitStatus[key] + charaPromotionStatus[key] + unitRarity[key] + unitRarity[`${key}_growth` as unitRarityKey] * (this.level + this.rank));
+    let key: charaStatusKey;
+    for (key in this.charaStatus) {
+      this.charaStatus[key] = Math.round(this.charaStatus[key] + charaPromotionStatus[key] + unitRarity[key] + unitRarity[`${key}_growth` as unitRarityKey] * (this.level + this.rank));
       if (uniqueEquipment) {
-        this.unitStatus[key] += Math.ceil(uniqueEquipment[key] + uniqueEquipmentEnhance[key] * this.uniqueEquipmentLevel);
+        this.charaStatus[key] += Math.ceil(uniqueEquipment[key] + uniqueEquipmentEnhance[key] * this.uniqueEquipmentLevel);
       }
+      this.$store.commit("setCharaStatus", this.charaStatus);
     }
   }
 
-  charaDataTo() {}
+  public toCharaProfile(unitid: number): void {
+    uni.navigateTo({
+      url: `/pages/character/profile/profile?unit_id=${unitid}`,
+    });
+  }
   skillType(index: number, pattern: unitAttackPattern) {
     if (!this.charaData) {
       return;

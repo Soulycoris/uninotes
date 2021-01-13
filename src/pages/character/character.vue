@@ -13,7 +13,7 @@
 // import Vue from "vue";
 import uniSearchBar from "@dcloudio/uni-ui/lib/uni-search-bar/uni-search-bar.vue";
 import uniCombox from "@/components/uni-combox/uni-combox.vue";
-import charaListItem from "./components/chara-list-item.vue";
+import charaListItem from "@/components/character/chara-list-item.vue";
 interface ComplexMessage {
   title: string;
   okMessage: string;
@@ -22,7 +22,7 @@ interface ComplexMessage {
 interface fitterActive {
   position: number;
   type: number;
-  sort: sort | "";
+  sort: sort;
 }
 type sort = "" | "height" | "age" | "weight";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
@@ -93,7 +93,8 @@ export default class extends Vue {
     });
   }
 
-  public charaBaseTo(unitid: Number): void {
+  public charaBaseTo(unitid: number): void {
+    this.$store.commit('setUnitId',unitid)
     uni.navigateTo({
       url: `/pages/character/base/base?unit_id=${unitid}`,
     });

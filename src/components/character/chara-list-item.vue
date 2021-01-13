@@ -1,7 +1,7 @@
 <template>
   <view>
     <view class="char-list-item" v-for="item in charaList" :key="item.unit_id" :data-unitId="item.unit_id" @click="charaBaseTo(item.unit_id)">
-      <view class="item-icon" :class="computedClassPositioning(item.search_area_width)"> </view>
+      <view v-if="showPositioning" class="item-icon" :class="computedClassPositioning(item.search_area_width)"> </view>
       <view class="item-head-img">
         <img :src="`http://localhost:3000/redive/estertion/icon/unit/${item.rarity === 6 ? item.prefab_id + 60 : item.prefab_id + 30}`" alt="" srcset="" />
       </view>
@@ -18,42 +18,38 @@
     </view>
   </view>
 </template>
-<script>
-export default {
-  props: {
-    charaList: {
-      type: Array,
-      default() {
-        return [];
-      },
+
+<script lang="ts">
+import { Component, Prop, Vue } from "vue-property-decorator";
+
+@Component({
+  name: "charaListItem",
+})
+export default class extends Vue {
+  private title: string = "Hello";
+
+  @Prop({
+    type: Array,
+    default() {
+      return [];
     },
-    sort: {
-      type: String,
-      default() {
-        return "";
-      },
-    },
-  },
-  data() {
-    return {
-      title: "Hello",
-    };
-  },
-  methods: {
-    charaBaseTo(unitid) {
-      this.$emit("on-click", unitid);
-    },
-    computedClassPositioning(width) {
-      if (width <= 300) {
-        return "type1";
-      } else if (width <= 600) {
-        return "type2";
-      } else {
-        return "type3";
-      }
-    },
-  },
-};
+  })
+  private charaList!: charaBase[];
+  @Prop({ default: "" }) private sort!: string;
+  @Prop({ default: true }) private showPositioning!: boolean;
+  public charaBaseTo(unitid: number) {
+    this.$emit("on-click", unitid);
+  }
+  public computedClassPositioning(positioning: number) {
+    if (positioning <= 300) {
+      return "type1";
+    } else if (positioning <= 600) {
+      return "type2";
+    } else {
+      return "type3";
+    }
+  }
+}
 </script>
 <style lang="scss" scoped>
 .char-list-item {
