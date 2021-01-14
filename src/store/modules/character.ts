@@ -14,6 +14,32 @@ export default class Character extends VuexModule {
   level: number = 184;
   rank: number = 19;
   uniqueEquipmentLevel: number = 190;
+  charaBase: charaBase = {
+    unit_id: 0,
+    unit_name: "",
+    kana: "",
+    prefab_id: 0,
+    move_speed: 0,
+    search_area_width: 0,
+    atk_type: 0,
+    normal_atk_cast_time: 0,
+    guild_id: 0,
+    comment: "",
+    start_time: "",
+    age: "",
+    guild: "",
+    race: "",
+    height: "",
+    weight: "",
+    birth_month: "",
+    birth_day: "",
+    blood_type: "",
+    favorite: "",
+    voice: "",
+    catch_copy: "",
+    self_text: "",
+    actual_name: "",
+  };
   charaData: charaData = {
     charaBase: [],
     charaStoryStatus: [],
@@ -63,6 +89,9 @@ export default class Character extends VuexModule {
   get getCharaData(): charaData {
     return this.charaData;
   }
+  get getCharaBase(): charaBase {
+    return this.charaBase;
+  }
   get getCharaStatus(): charaStatus {
     return this.charaStatus;
   }
@@ -86,6 +115,10 @@ export default class Character extends VuexModule {
   @Mutation
   setCharaData(charaData: charaData) {
     this.charaData = charaData;
+  }
+  @Mutation
+  setCharaBase(charaBase: charaBase) {
+    this.charaBase = charaBase;
   }
   @Mutation
   setCharaStatus(charaStatus: charaStatus) {

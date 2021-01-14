@@ -38,7 +38,7 @@ interface charaStatus {
   hp_recovery_rate: number;
 }
 type charaStatusKey = keyof charaStatus;
-
+type charaBaseKey = keyof charaBase;
 interface charaBase {
   unit_id: number;
   unit_name: string;

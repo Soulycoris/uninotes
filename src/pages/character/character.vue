@@ -117,7 +117,7 @@ export default class extends Vue {
   position: relative;
   display: flex;
   align-items: center;
-  padding: 8px;
+  padding: 8rpx;
   &:hover {
     background-color: #373737;
   }
@@ -139,7 +139,7 @@ export default class extends Vue {
   }
   .item-head-img {
     width: 134rpx;
-    margin-right: 16px;
+    margin-right: 16rpx;
     img {
       width: 100%;
     }
@@ -150,18 +150,18 @@ export default class extends Vue {
     flex-direction: column;
     max-width: 80vw;
     .item-jpn {
-      font-size: 15px;
-      padding: 8px 0;
+      font-size: $uni-font-size-base;
+      padding: 8rpx 0;
     }
     .item-cnn {
-      font-size: 12px;
-      padding: 8px 0;
+      font-size: $uni-font-size-sm;
+      padding: 8rpx 0;
     }
   }
   .item-other {
     position: absolute;
     right: 0;
-    padding-right: 16px;
+    padding-right: 16rpx;
   }
 }
 </style>

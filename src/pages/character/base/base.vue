@@ -15,7 +15,7 @@
       <view class="chara-state-box">
         <view class="chara-state-status">
           <view class="chara-state-item" v-for="(value, name) in charaStatus" :key="name">
-            <view class="chara-state-item-tag">{{ name | stateText }}</view>
+            <view class="chara-state-item-tag">{{ $t(`character.charaStatus.${name}`) }}</view>
             <view class="chara-state-item-text">{{ value }}</view>
           </view>
         </view>
@@ -121,28 +121,6 @@ import { Component, Vue } from "vue-property-decorator";
       }
       return text;
     },
-    stateText(key: charaStatusKey) {
-      const stateText = {
-        hp: "HP",
-        atk: "物理攻击",
-        def: "物理防御",
-        magic_str: "魔法攻击",
-        magic_def: "魔法防御",
-        physical_critical: "物理暴击",
-        magic_critical: "魔法暴击",
-        accuracy: "命中",
-        dodge: "闪避",
-        life_steal: "生命吸收",
-        wave_hp_recovery: "HP自动回复",
-        wave_energy_recovery: "TP自动回复",
-        hp_recovery_rate: "回复量上升",
-        energy_recovery_rate: "TP上升",
-        energy_reduce_rate: "TP消耗减轻",
-        magic_penetrate: "魔法穿透",
-        physical_penetrate: "物理穿透",
-      };
-      return stateText[key] || "";
-    },
   },
   components: { charaListItem },
 })
@@ -223,6 +201,7 @@ export default class extends Vue {
         if (res.data) {
           this.$set(this, "charaData", res.data as charaData);
           this.$store.commit("setCharaData", res.data);
+          this.$store.commit("setCharaBase", this.charaData.charaBase[0]);
           if (this.charaData) {
             this.rank = this.charaData.charaPromotionStatus[0].promotion_level;
             this.$store.commit("setRank", this.rank);
@@ -446,7 +425,7 @@ export default class extends Vue {
   .chara-state {
     padding: 8px;
     border-top: 2px #303030;
-    font-size: 14px;
+    font-size: $uni-font-size-base;
     .chara-tag {
       display: inline;
       border-radius: 4px;
@@ -455,7 +434,7 @@ export default class extends Vue {
       background-color: #773f99;
     }
     .chara-level {
-      font-size: 14px;
+      font-size: $uni-font-size-base;
     }
   }
   .chara-state-level {
@@ -492,12 +471,12 @@ export default class extends Vue {
         display: flex;
         flex-direction: column;
         align-items: center;
-        font-size: 8px;
+        font-size: 16rpx;
         margin-right: 14rpx;
         margin-bottom: 14rpx;
         img {
           width: 105rpx;
-          margin: 2px 0;
+          margin: 4rpx 0;
         }
       }
     }
@@ -510,7 +489,7 @@ export default class extends Vue {
     .chara-state-skill-name {
       display: flex;
       flex-direction: column;
-      padding: 0 8px;
+      padding: 0 16rpx;
       .chara-state-skill-name-text {
         margin-bottom: 18rpx;
       }
