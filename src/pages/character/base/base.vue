@@ -426,13 +426,6 @@ export default class extends Vue {
     padding: 8px;
     border-top: 2px #303030;
     font-size: $uni-font-size-base;
-    .chara-tag {
-      display: inline;
-      border-radius: 4px;
-      padding: 1rpx 9rpx 6rpx 9rpx;
-      color: #fff;
-      background-color: #773f99;
-    }
     .chara-level {
       font-size: $uni-font-size-base;
     }
@@ -441,29 +434,6 @@ export default class extends Vue {
     justify-content: space-between;
   }
   .chara-state-box {
-    display: flex;
-    align-items: center;
-    // justify-content: space-between;
-    margin-bottom: 20rpx;
-    .chara-state-status {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
-    .chara-state-item {
-      display: flex;
-      justify-content: space-between;
-      width: 48%;
-      margin-top: 16rpx;
-      border-bottom: 1px solid #525252;
-      .chara-state-item-tag {
-        background-color: #525252;
-        padding: 1rpx 6rpx 1rpx 6rpx;
-        border-top-left-radius: 4px;
-        border-top-right-radius: 4px;
-      }
-    }
     .chara-state-skill-loop {
       display: flex;
       flex-wrap: wrap;
@@ -471,7 +441,7 @@ export default class extends Vue {
         display: flex;
         flex-direction: column;
         align-items: center;
-        font-size: 16rpx;
+        font-size: 20rpx;
         margin-right: 14rpx;
         margin-bottom: 14rpx;
         img {
