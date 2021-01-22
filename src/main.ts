@@ -4,7 +4,8 @@ import App from "./App.vue";
 import store from "./store";
 import VueI18n from "vue-i18n";
 import I18nMessages from "./assets/i18n/index";
-
+import hostConfig from "./config/host";
+Vue.prototype.$hostConfig = hostConfig;
 Vue.use(VueI18n);
 
 Vue.config.productionTip = false;

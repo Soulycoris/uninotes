@@ -1,7 +1,7 @@
 <template>
   <view class="chara-base">
     <view class="chara-img">
-      <img v-if="charaData.charaBase.length" :src="`http://localhost:3000/redive/estertion/card/full/${charaData.unitRarity.length === 6 ? charaData.charaBase[0].prefab_id + 60 : charaData.charaBase[0].prefab_id + 30}`" alt="" srcset="" />
+      <img v-if="charaData.charaBase.length" :src="`${$hostConfig.resUrl}/card/full/${charaData.unitRarity.length === 6 ? charaData.charaBase[0].prefab_id + 60 : charaData.charaBase[0].prefab_id + 30}`" alt="" srcset="" />
     </view>
     <chara-list-item :charaList="charaData.charaBase" @on-click="toCharaProfile"> </chara-list-item>
     <view class="chara-state">
@@ -38,7 +38,7 @@
               <view>
                 {{ item | filterLoopTopText(pattern) }}
               </view>
-              <img :src="`http://localhost:3000/redive/estertion/icon/skill/${skillType(item, pattern)}`" alt="" />
+              <img :src="`${$hostConfig.resUrl}/icon/skill/${skillType(item, pattern)}`" alt="" />
               <view>
                 {{ item | filterLoopBottomText(pattern) }}
               </view>
@@ -52,7 +52,7 @@
         </view>
         <view class="chara-state-box" :key="skill.skill_id + 'name'">
           <view class="chara-state-skill">
-            <img :src="`http://localhost:3000/redive/estertion/icon/skill/${skill.icon_type}`" alt="" />
+            <img :src="`${$hostConfig.resUrl}/icon/skill/${skill.icon_type}`" alt="" />
           </view>
           <view class="chara-state-skill-name">
             <view class="chara-state-skill-name-text">
@@ -172,7 +172,7 @@ export default class extends Vue {
 
   public getMaxLevel() {
     uni.request({
-      url: "http://localhost:3000/get/unit_data/maxLevel",
+      url: `${this.$hostConfig.hostUrl}/unit/maxLevel`,
       success: (res) => {
         if (typeof res.data === "number") {
           this.level = --res.data;
@@ -184,7 +184,7 @@ export default class extends Vue {
 
   public getMaxUniqueEquipmentLevel() {
     uni.request({
-      url: "http://localhost:3000/get/unit_data/maxUniqueEquipmentLevel",
+      url: `${this.$hostConfig.hostUrl}/unit/maxUniqueEquipmentLevel`,
       success: (res) => {
         if (typeof res.data === "number") {
           this.uniqueEquipmentLevel = --res.data;
@@ -196,7 +196,7 @@ export default class extends Vue {
 
   public getCharaBase(unitId: number) {
     uni.request({
-      url: "http://localhost:3000/get/unit_data/base/" + unitId,
+      url: `${this.$hostConfig.hostUrl}/unit/base/${unitId}`,
       success: (res) => {
         if (res.data) {
           this.$set(this, "charaData", res.data as charaData);

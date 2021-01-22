@@ -6,7 +6,9 @@
       <uni-combox label="位置" :candidates="fitterArray.position" v-model="fitterActive.position"></uni-combox>
       <uni-combox label="排序" :candidates="fitterArray.sort" v-model="fitterActive.sort"></uni-combox>
     </view>
-    <chara-list-item class="char-list" :charaList="fitterCharaBase" :sort="fitterActive.sort" @on-click="charaBaseTo"> </chara-list-item>
+    <scroll-view :scroll-top="0" scroll-y="true" class="scroll-Y" @scroll="scroll">
+      <chara-list-item class="char-list" :charaList="fitterCharaBase" :sort="fitterActive.sort" :scrollTop="scrollTop" @on-click="charaBaseTo"> </chara-list-item>
+    </scroll-view>
   </view>
 </template>
 <script lang="ts">
@@ -24,6 +26,7 @@ interface fitterActive {
   type: number;
   sort: sort;
 }
+
 type sort = "" | "height" | "age" | "weight";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
@@ -34,6 +37,7 @@ import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 export default class extends Vue {
   private charaList: charaBase[] = [];
   private searchInput: string = "";
+  private scrollTop: number = 0;
   private fitterArray = {
     type: [
       { key: 0, value: "全部" },
@@ -72,7 +76,7 @@ export default class extends Vue {
         if (this.fitterActive.sort) {
           return +a[this.fitterActive.sort] - +b[this.fitterActive.sort];
         }
-        return 0
+        return 0;
       });
     }
     return arr;
@@ -84,7 +88,7 @@ export default class extends Vue {
 
   public getCharaBase(): void {
     uni.request({
-      url: "http://localhost:3000/get/unit_data/list",
+      url: `${this.$hostConfig.hostUrl}/unit/list`,
       success: (res) => {
         if (Array.isArray(res.data)) {
           this.charaList = res.data;
@@ -94,16 +98,23 @@ export default class extends Vue {
   }
 
   public charaBaseTo(unitid: number): void {
-    this.$store.commit('setUnitId',unitid)
+    this.$store.commit("setUnitId", unitid);
     uni.navigateTo({
       url: `/pages/character/base/base?unit_id=${unitid}`,
     });
+  }
+  public scroll(e: any) {
+    // console.log(e);
+    this.scrollTop = e.detail.scrollTop;
   }
 }
 </script>
 <style lang="scss">
 .character {
   background-color: #202020;
+  .scroll-Y {
+    height: 80vh;
+  }
 }
 .uni-searchbar {
   background-color: #202020;

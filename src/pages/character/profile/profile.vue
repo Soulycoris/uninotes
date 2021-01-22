@@ -35,8 +35,8 @@
         <view class="chara-state-box">
           <view class="chara-unique-equipment">
             <view class="chara-unique-equipment-img">
-              <img v-if="getCharaData.uniqueEquipment.length" :src="`http://localhost:3000/redive/estertion/icon/equipment/${getCharaData.uniqueEquipment[0].equipment_id}`" alt="" />
-              <img v-else :src="`http://localhost:3000/redive/estertion/icon/equipment/999999`" alt="" />
+              <img v-if="getCharaData.uniqueEquipment.length" :src="`${$hostConfig.resUrl}/icon/equipment/${getCharaData.uniqueEquipment[0].equipment_id}`" alt="" />
+              <img v-else :src="`${$hostConfig.resUrl}/icon/equipment/999999`" alt="" />
             </view>
             <view class="chara-unique-equipment-text">{{ !getCharaData.uniqueEquipment.length ? "暂无专属装备" : getCharaData.uniqueEquipment[0].equipment_name }}</view>
           </view>
@@ -50,8 +50,8 @@
           <view class="chara-equipment">
             <view class="chara-equipment-img">
               <template v-for="index in 6">
-                <img :key="index" v-if="promotion[`equip_slot_${index}`] !== 999999" :src="`http://localhost:3000/redive/estertion/icon/equipment/${promotion[`equip_slot_${index}`]}`" alt="" />
-                <img :key="index" v-else :src="`http://localhost:3000/redive/estertion/icon/equipment/999999`" alt="" />
+                <img :key="index" v-if="promotion[`equip_slot_${index}`] !== 999999" :src="`${$hostConfig.resUrl}/icon/equipment/${promotion[`equip_slot_${index}`]}`" alt="" />
+                <img :key="index" v-else :src="`${$hostConfig.resUrl}/icon/equipment/999999`" alt="" />
               </template>
             </view>
           </view>
