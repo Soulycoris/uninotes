@@ -6,7 +6,6 @@ router.get("/close", async (ctx, next) => {
   ctx.success({ success: true });
 });
 router.get("/version", async (ctx, next) => {
-  db.close();
   updateDatabase()
   ctx.body = true;
 });

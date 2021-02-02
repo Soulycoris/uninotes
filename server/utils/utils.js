@@ -13,6 +13,7 @@ export const updateDatabase = async () => {
     console.log("检测数据库更新，线上版本：", res.data.TruthVersion);
     if (res.data.TruthVersion !== version) {
       console.log("正在更新数据库...");
+      db.close();
       const dbPath = Path.resolve(process.cwd(), "./database/redive_jp.db.br");
       const targetPath = Path.resolve(process.cwd(), "./database/redive_jp.db");
       let dbres = await getDBFile("https://redive.estertion.win/db/redive_jp.db.br", dbPath);
@@ -31,14 +32,7 @@ export const getDBFile = (url, filePath) => {
   return new Promise((resolve, reject) => {
     axios({
       url,
-      responseType: "stream",
-      onDownloadProgress(progress) {
-        let complete = Math.round((progress.loaded / progress.total) * 100);
-        if (complete / 5 === 0) {
-          console.log("下载进度：" + complete + "%");
-        }
-        console.log(Math.round((progress.loaded / progress.total) * 100) + "%");
-      },
+      responseType: "stream"
     }).then((resp) => {
       const writer = fs.createWriteStream(filePath);
       resp.data.pipe(writer);
